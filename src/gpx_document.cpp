@@ -45,6 +45,29 @@ void GPXDocument::extractWaypoints()
 
 void GPXDocument::extractRoutes()
 {
+    for(auto root_node = gpx_document_.FirstChildElement("rte"); root_node != nullptr; root_node->NextSiblingElement("rte"))
+    {
+        float lat;
+        float lon;
+
+        XMLError lat_result = root_node->QueryFloatAttribute("lat", &lat);
+        XMLError lon_result = root_node->QueryFloatAttribute("lon", &lon);
+
+        if(lat_result == lon_result == XMLError::XML_SUCCESS)
+        {
+            Waypoint waypoint(lat, lon);
+
+            auto name_element = root_node->FirstChildElement("name");
+            if(name_element != nullptr)
+            {
+                const char * name_ptr = name_element->GetText();
+
+                waypoint.setName(name_ptr);
+            }
+
+            waypoints_.push_back(waypoint);
+        }
+    }
 
 }
 
