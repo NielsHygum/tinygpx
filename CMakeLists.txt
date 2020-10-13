@@ -16,7 +16,7 @@ target_compile_options(tinygpx
         PRIVATE
         -std=c++17
         -Wall
-        -Wextra-semi
+        -Wextra
         -Wshadow
         -Ofast)
 
