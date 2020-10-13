@@ -10,6 +10,9 @@ private:
     tinyxml2::XMLDocument gpx_document_;
     std::list<Route> routes_;
     std::list<Waypoint> waypoints_;
+
+    void extractWaypoints();
+    void extractRoutes();
 public:
     tinyxml2::XMLError loadFile(std::string filename);
     const std::list<Route> & getRoutes() const;

@@ -16,6 +16,7 @@ public:
     Waypoint(float latitude, float longitude);
     void setElevation(float elevation);
     void setName(std::string name);
+    std::string getName() const;
     float getLatitude() const;
     float getLongitude() const;
     float getElevation() const;

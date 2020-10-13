@@ -22,9 +22,15 @@ target_compile_options(tinygpx
 
 target_link_libraries(tinygpx PRIVATE tinyxml2)
 
-install(TARGETS tinygpx
+if(__ANDROID__)
+    install(TARGETS tinygpx
+            LIBRARY DESTINATION lib/${ANDROID_ABI}
+            ARCHIVE DESTINATION lib/${ANDROID_ABI})
+else()
+    install(TARGETS tinygpx
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib)
+endif()
 
 # Also install the headers
 install(DIRECTORY include/tinygpx DESTINATION include)

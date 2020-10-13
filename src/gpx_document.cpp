@@ -17,55 +17,78 @@ XMLError GPXDocument::loadFile(std::string filename)
 
 void GPXDocument::extractWaypoints()
 {
-    for(auto root_node = gpx_document_.FirstChildElement("wpt"); root_node != nullptr; root_node->NextSiblingElement("wpt"))
+    XMLElement * gpx_root = gpx_document_.FirstChildElement("gpx");
+
+    if(gpx_root != nullptr)
     {
-        float lat;
-        float lon;
-
-        XMLError lat_result = root_node->QueryFloatAttribute("lat", &lat);
-        XMLError lon_result = root_node->QueryFloatAttribute("lon", &lon);
-
-        if(lat_result == lon_result == XMLError::XML_SUCCESS)
+        for(auto root_node = gpx_root->FirstChildElement("wpt"); root_node != nullptr; root_node = root_node->NextSiblingElement("wpt"))
         {
-            Waypoint waypoint(lat, lon);
+            float lat;
+            float lon;
 
-            auto name_element = root_node->FirstChildElement("name");
-            if(name_element != nullptr)
+            XMLError lat_result = root_node->QueryFloatAttribute("lat", &lat);
+            XMLError lon_result = root_node->QueryFloatAttribute("lon", &lon);
+
+            if((lat_result == XMLError::XML_SUCCESS) and (lon_result == XMLError::XML_SUCCESS))
             {
-                const char * name_ptr = name_element->GetText();
+                Waypoint waypoint(lat, lon);
 
-                waypoint.setName(name_ptr);
+                auto name_element = root_node->FirstChildElement("name");
+                if(name_element != nullptr)
+                {
+                    const char * name_ptr = name_element->GetText();
+
+                    waypoint.setName(name_ptr);
+                }
+
+                waypoints_.push_back(waypoint);
             }
-
-            waypoints_.push_back(waypoint);
         }
     }
-
 }
 
 void GPXDocument::extractRoutes()
 {
-    for(auto root_node = gpx_document_.FirstChildElement("rte"); root_node != nullptr; root_node->NextSiblingElement("rte"))
+    XMLElement * gpx_root = gpx_document_.FirstChildElement("gpx");
+
+    if(gpx_root != nullptr)
     {
-        float lat;
-        float lon;
-
-        XMLError lat_result = root_node->QueryFloatAttribute("lat", &lat);
-        XMLError lon_result = root_node->QueryFloatAttribute("lon", &lon);
-
-        if(lat_result == lon_result == XMLError::XML_SUCCESS)
+        for(auto root_node = gpx_root->FirstChildElement("rte"); root_node != nullptr; root_node =root_node->NextSiblingElement("rte"))
         {
-            Waypoint waypoint(lat, lon);
+            Route route;
 
             auto name_element = root_node->FirstChildElement("name");
             if(name_element != nullptr)
             {
                 const char * name_ptr = name_element->GetText();
 
-                waypoint.setName(name_ptr);
+                route.setName(name_ptr);
             }
 
-            waypoints_.push_back(waypoint);
+            for(auto rte_node = root_node->FirstChildElement("rtept"); rte_node != nullptr; rte_node = rte_node->NextSiblingElement("rtept"))
+            {
+                float lat;
+                float lon;
+
+                XMLError lat_result = rte_node->QueryFloatAttribute("lat", &lat);
+                XMLError lon_result = rte_node->QueryFloatAttribute("lon", &lon);
+
+                if((lat_result == XMLError::XML_SUCCESS) and (lon_result == XMLError::XML_SUCCESS))
+                {
+                    Waypoint waypoint(lat, lon);
+
+                    auto name_element = rte_node->FirstChildElement("name");
+                    if(name_element != nullptr)
+                    {
+                        const char * name_ptr = name_element->GetText();
+
+                        waypoint.setName(name_ptr);
+                    }
+
+                    route.push_back(waypoint);
+                }
+            }
+            routes_.push_back(route);
         }
     }
 
